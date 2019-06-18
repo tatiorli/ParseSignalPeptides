@@ -1,14 +1,13 @@
 # ParseSignalPeptides
-2019
-Copyright by Erika Pinheiro-Machado and Tatiana Orli Milkewitz Sandberg
+2019 - Copyright by Erika Pinheiro-Machado and Tatiana Orli Milkewitz Sandberg
 
 ParseSignalPeptides.py was developed in order to extract a query list of peptides from a Protein database (Uniprot) and parse the results obtained, looking for a signal peptide. This program was specially tailored to use this protein database with its .xml output format and relies solely in the information provided by it. The program provides the following information for each line entry of a Uniprot accession code: signal peptide range, Uniprot “Subcellular location” annotation, the protein complete sequence and if the motif “XXEL” was found in the end of the protein sequence and the found motif sequence.
 
 •	Software requirements
 
-	Python version 3.7 or earlier. We do not guarantee compatibility with previous versions.
-	Python libraries employed by this program: getopt, sys, requests, time, bs4, re and pandas.
-	Other option could be instead of installing the previous modules, to install Anaconda.
+*	Python version 3.7 or earlier. We do not guarantee compatibility with previous versions.
+*	Python libraries employed by this program: getopt, sys, requests, time, bs4, re and pandas.
+*	Other option could be instead of installing the previous modules, to install Anaconda.
 This software is compatible with all Windows and Linux systems.
 
 •	Mandatory input file format and command syntax
@@ -25,9 +24,6 @@ Then, it prompts the user for the input filename and output filename. It opens t
 First, install all the Python modules requested by this software. Then, download from our GitHub repository an input file named “example.xlsx” and execute this command in your preferred command line:
 ParseSignalPeptides.py -i example.xlsx -o outputfile.xlsx
 
-How the expected output should look like:
-
- 
 OBSERVATION: Empty spaces in the output file means that the provided information of that accession number for that column is also empty. For example, if a protein does not contain an annotated signal protein in Uniprot, it will appears as a blank space in the excel output file. 
 
 •	Citing
