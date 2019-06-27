@@ -13,7 +13,7 @@ This software is compatible with all Windows and Linux systems.
 •	Mandatory input file format and command syntax
 The user needs to provide an excel input file in .xlsx format (the default XML-based file format for Excel 2010 and Excel 2007) with the list of proteins to parse. It must contain three columns named as: “Uniprot” (containing the Uniprot accession codes); “Protein names” and “Gene names”. When executed, the program expect the user to provide the name (and path location) of the input file. We recommend to execute this program in the same directory of the excel input file. The program also expects an output file name for latter saving the results. Syntax of the basic command:
 
-ParseSignalPeptides.py -i <inputfile> -o <outputfile>
+ParseSignalPeptides.py -i [inputfile] -o [outputfile]
 
 •	Explained software code
 The program starts by importing requested modules and import pandas as panel data.
@@ -22,6 +22,7 @@ Then, it prompts the user for the input filename and output filename. It opens t
 •	Quick tutorial: command and expected output
 
 First, install all the Python modules requested by this software. Then, download from our GitHub repository an input file named “example.xlsx” and execute this command in your preferred command line:
+
 ParseSignalPeptides.py -i example.xlsx -o outputfile.xlsx
 
 OBSERVATION: Empty spaces in the output file means that the provided information of that accession number for that column is also empty. For example, if a protein does not contain an annotated signal protein in Uniprot, it will appears as a blank space in the excel output file. 
