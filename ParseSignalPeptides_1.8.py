@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Welcome to ParseSignalPeptides.py. This program was developed in order to return a query list of peptides from a Protein database (Uniprot) and parse the results looking for a signal peptide.
 # Copyright by Erika Pinheiro-Machado and Tatiana Orli Milkewitz Sandberg
-# 2019 Version 1.7
+# 2019 Version 1.8
 
 # Starts by importing requested modules
 import getopt, sys, requests, time,  bs4, re
@@ -30,10 +30,6 @@ for opt, arg in opts:
 print(f"Input file is: {inputfile}")
 print(f"Output file is: {outputfile}")
 
-# Open excel file
-inputfile = "fim_out.xlsx"
-# Create an output file
-outputfile = "fim_out2.xlsx"
 # Loading the excel files and create extra columns for the results
 pd.options.mode.chained_assignment = None
 xl = pd.ExcelFile(inputfile)
@@ -64,58 +60,51 @@ print("###################################################")
 count = 0
 failed = 0
 for i in excel_new.index:
+    if count == 20:
+        time.sleep(30)
+        count = 0
     ## Create var with the data for the search and Use the acession code to get the xml file
     params = {"query": excel_new['UniProt'][i], "format": "xml"}
     response = requests.get("http://www.uniprot.org/uniprot/", params)
     soup = bs4.BeautifulSoup(response.content, 'html.parser')
     # Iterate inside the acessions's code list, stop after 19 requests and break 5 seconds (to avoid overload of Uniprot server)
-    if count < 20:
-        count += 1
-        print("COUNT IS:",count)
-        # Check if the protein accession in not obsolete in Uniprot (by checking soup contents)
-        if soup.contents:
-            pass
-        else:
-            excel_new['full_sequence'][i] = "obsolete entry"
-            failed += 1
-            continue
-        # First, Grab all the features for subcellular location information
-        sub_loc = soup.select('comment[type="subcellular location"]')
-        # Transform it into a string and match the string whenever appears a subcellular location
-        a = str(sub_loc)
-        # result = re.findall(r'<location evidence="\d+">([^<]+)<\/location>', a)
-        result = []
-        for tag in soup.select('location[evidence]'):
-            result.append(tag.get_text().strip())
-        excel_new['locations'][i] = ', '.join(result)
-        print(excel_new['locations'][i])
-        # Second, Grab the raw protein sequence
-        sequence = soup.select('sequence[length]')[0].get_text().replace('\n', '')
-        print(sequence)
-        excel_new['full_sequence'][i] = sequence
-
-        print("Time now: %s" % time.ctime())
-        # If the protein has a signal peptide, parse the information
-        features = soup.select('feature[type="signal peptide"]')
-        if len(features) > 0:
-            # Grab start and end position of the signal peptide
-            feature = features[0]
-            start = feature.select('begin')[0].get('position')   # Get start position
-            print(start)
-            end = feature.select('end')[0].get('position')   # Get end position
-            print(end)
-            excel_new['signal_sequence'][i] = start+" "+end
-            # Last, look for the KDEL in the final 4 aminoacids
-            searcher = re.compile('[ARNDCQEGHILKMFPSTWYVBZ][ARNDCQEGHILKMFPSTWYVBZ][E][L]')
-            # Select last four characters of the full sequence
-            final_aa = sequence[-4:]
-            # Check if there is a match with the regular expression
-            matched = searcher.match(final_aa)
-            if matched:
-                excel_new['kdel_found'][i] = matched.group(0)
+    count += 1
+    # Check if the protein accession in not obsolete in Uniprot (by checking soup contents)
+    if soup.contents:
+        pass
     else:
-        time.sleep(30)
-        count = 0
+        excel_new['full_sequence'][i] = "obsolete entry"
+        failed += 1
+        continue
+    # First, Grab all the features for subcellular location information
+    sub_loc = soup.select('comment[type="subcellular location"]')
+    # Transform it into a string and match the string whenever appears a subcellular location
+    a = str(sub_loc)
+    # result = re.findall(r'<location evidence="\d+">([^<]+)<\/location>', a)
+    result = []
+    for tag in soup.select('subcellularlocation location'):
+        result.append(tag.get_text().strip())
+    excel_new['locations'][i] = ', '.join(result)
+    # Second, Grab the raw protein sequence
+    sequence = soup.select('sequence[length]')[0].get_text().replace('\n', '')
+    excel_new['full_sequence'][i] = sequence
+    # If the protein has a signal peptide, parse the information
+    features = soup.select('feature[type="signal peptide"]')
+    if len(features) > 0:
+        # Grab start and end position of the signal peptide
+        feature = features[0]
+        start = feature.select('begin')[0].get('position')   # Get start position
+        end = feature.select('end')[0].get('position')   # Get end position
+        excel_new['signal_sequence'][i] = start+" "+end
+        # Last, look for the KDEL in the final 4 aminoacids
+        searcher = re.compile('[ARNDCQEGHILKMFPSTWYVBZ]{2}EL')
+        # Select last four characters of the full sequence
+        final_aa = sequence[-4:]
+        # Check if there is a match with the regular expression
+        matched = searcher.match(final_aa)
+        if matched:
+            excel_new['kdel_found'][i] = matched.group(0)
+
 
 # Change columns final names or rename columns for clarification
 excel_new = excel_new.rename(columns={'name': 'Protein names','gene name':'Gene names','signal_sequence': 'Signal peptide', 'locations': 'Subcellular location', 'full_sequence': 'Sequence'})
