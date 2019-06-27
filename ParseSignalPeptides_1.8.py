@@ -80,7 +80,6 @@ for i in excel_new.index:
     sub_loc = soup.select('comment[type="subcellular location"]')
     # Transform it into a string and match the string whenever appears a subcellular location
     a = str(sub_loc)
-    # result = re.findall(r'<location evidence="\d+">([^<]+)<\/location>', a)
     result = []
     for tag in soup.select('subcellularlocation location'):
         result.append(tag.get_text().strip())
