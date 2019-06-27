@@ -11,11 +11,13 @@ ParseSignalPeptides.py was developed in order to extract a query list of peptide
 This software is compatible with all Windows and Linux systems.
 
 •	Mandatory input file format and command syntax
+
 The user needs to provide an excel input file in .xlsx format (the default XML-based file format for Excel 2010 and Excel 2007) with the list of proteins to parse. It must contain three columns named as: “Uniprot” (containing the Uniprot accession codes); “Protein names” and “Gene names”. When executed, the program expect the user to provide the name (and path location) of the input file. We recommend to execute this program in the same directory of the excel input file. The program also expects an output file name for latter saving the results. Syntax of the basic command:
 
 ParseSignalPeptides.py -i [inputfile] -o [outputfile]
 
 •	Explained software code
+
 The program starts by importing requested modules and import pandas as panel data.
 Then, it prompts the user for the input filename and output filename. It opens the excel input file and create an output file. It loads the content of the input file and creates extra columns for result handling. Then it collects the column of the list of accessions numbers for Uniprot querying and iterate in that list, using the accession to request the corresponding .xml file from the database. For each .xml file, it will parse it and collect: 1st) All the features for subcellular location information; 2nd) The raw protein sequence; 3rd) Checks if the protein presents a signal peptide, and if yes, 4th) parse the information for the start and end position of the signal peptide; 5th) Locate the XXEL end motif and collect the sequence final 4 amino acids. Last, the program will save all the results in the new excel output file.
 
